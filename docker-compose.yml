@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: flexible_product_db
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: flexible_product_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: flexible_product_app
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: "postgresql://admin:admin@postgres:5432/flexible_product_db"
+    ports:
+      - "3000:3000"
+    command: ["sh", "-c", "npx prisma generate && npx prisma migrate deploy && npx prisma db seed && npm run build && npm start"]
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:
