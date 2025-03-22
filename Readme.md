@@ -14,7 +14,7 @@ Ensure you have Docker and Docker Compose installed on your system.
 ## Running the Project with Docker
 1. Clone the repository:
    ```sh
-   git clone https://github.com/yourusername/flexible-product-model.git
+   git clone https://github.com/hugobernardoni/flexible-product-model.git
    cd flexible-product-model
    ```
 2. Start the application using Docker Compose:
