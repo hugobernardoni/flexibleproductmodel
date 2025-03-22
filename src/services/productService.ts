@@ -5,6 +5,31 @@ const prisma = new PrismaClient();
 
 export class ProductService {
     async createProduct(data: ProductDTO) {
+        const customerExists = await prisma.customer.findUnique({
+            where: { id: data.customerId }
+        });
+
+        if (!customerExists) {
+            throw { status: 400, message: 'Customer not found' };
+        }
+
+        const attributeIds = data.attributes.map(attr => attr.attributeId);
+        const existingAttributes = await prisma.attribute.findMany({
+            where: { id: { in: attributeIds } }
+        });
+
+        if (existingAttributes.length !== attributeIds.length) {
+            throw { status: 400, message: 'Some attributes do not exist' };
+        }
+
+        const skuExists = await prisma.product.findFirst({
+            where: { sku: data.sku, customerId: data.customerId }
+        });
+
+        if (skuExists) {
+            throw { status: 400, message: 'A product with this SKU already exists for this customer' };
+        }
+
         return prisma.product.create({
             data: {
                 sku: data.sku,
